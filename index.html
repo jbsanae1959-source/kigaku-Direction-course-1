@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>気学方位コース-1 ｜ 吉方位アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --washi:        #faf6ef;
+      --cream:        #f5efe2;
+      --parchment:    #ede4d2;
+      --sakura:       #e8a5b8;
+      --sakura-pale:  #f9eaef;
+      --wakakusa:     #7aab6a;
+      --wakakusa-pale:#eaf4e5;
+      --cha:          #9b7345;
+      --cha-light:    #c9a87c;
+      --ink:          #2a2118;
+      --ink-mid:      #5a4a38;
+      --ink-light:    #8a7a68;
+      --gold:         #b07d38;
+      --red-ko:       #b5362a;
+      --green-ko:     #2d6e2a;
+      --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+      --sans:  'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --r: 14px;
+      --r-sm: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--sans);
+      background: var(--washi);
+      color: var(--ink);
+      min-height: 100vh;
+      line-height: 1.7;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(232,165,184,0.07) 0%, transparent 50%),
+        radial-gradient(circle at 85% 75%, rgba(122,171,106,0.07) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== FORM ===== */
+    #form-section {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      min-height: 100vh; padding: 40px 20px;
+    }
+
+    .form-masthead { text-align: center; margin-bottom: 36px; }
+    .form-masthead .tagline {
+      font-size: 0.78rem; letter-spacing: 0.3em;
+      color: var(--cha-light); margin-bottom: 8px;
+    }
+    .form-masthead h1 {
+      font-family: var(--serif);
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 900; letter-spacing: 0.2em;
+      color: var(--ink); line-height: 1.2;
+    }
+    .form-masthead .sub {
+      margin-top: 8px; font-size: 0.82rem;
+      color: var(--ink-light); letter-spacing: 0.15em;
+    }
+
+    .hanabana {
+      display: flex; align-items: center;
+      gap: 12px; justify-content: center; margin: 14px 0;
+    }
+    .hanabana::before, .hanabana::after {
+      content: ''; display: block; width: 60px; height: 1px;
+    }
+    .hanabana::before { background: linear-gradient(90deg, transparent, var(--cha-light)); }
+    .hanabana::after  { background: linear-gradient(90deg, var(--cha-light), transparent); }
+    .hanabana-icon { color: var(--sakura); font-size: 1.1rem; }
+
+    .form-card {
+      width: 100%; max-width: 480px;
+      background: white; border: 1px solid var(--parchment);
+      border-radius: var(--r); padding: 36px 36px 40px;
+      box-shadow: 0 2px 8px rgba(42,33,24,0.05), 0 12px 40px rgba(42,33,24,0.08);
+    }
+    .form-card h2 {
+      font-family: var(--serif); font-size: 0.88rem;
+      letter-spacing: 0.25em; color: var(--cha);
+      text-align: center; margin-bottom: 28px;
+      padding-bottom: 16px; border-bottom: 1px solid var(--parchment);
+    }
+
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block; font-size: 0.82rem; font-weight: 700;
+      color: var(--ink-mid); letter-spacing: 0.08em; margin-bottom: 7px;
+    }
+    .req {
+      display: inline-block; font-size: 0.65rem; font-weight: 400;
+      color: var(--red-ko); background: rgba(181,54,42,0.08);
+      padding: 1px 5px; border-radius: 3px; margin-left: 6px;
+    }
+    .opt { font-size: 0.65rem; font-weight: 400; color: var(--ink-light); margin-left: 6px; }
+    .field input, .field select {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid var(--parchment); border-radius: var(--r-sm);
+      background: var(--washi); font-family: var(--sans);
+      font-size: 1rem; color: var(--ink);
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+    .field input:focus, .field select:focus {
+      border-color: var(--cha-light);
+      box-shadow: 0 0 0 3px rgba(176,125,56,0.12);
+    }
+
+    .btn-primary {
+      display: block; width: 100%; padding: 16px;
+      background: var(--ink); color: #f5ead8; border: none;
+      border-radius: var(--r-sm); font-family: var(--serif);
+      font-size: 1.05rem; font-weight: 700;
+      letter-spacing: 0.3em; cursor: pointer; margin-top: 28px;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: var(--cha); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ===== RESULT ===== */
+    #result-section { display: none; position: relative; z-index: 1; }
+    #result-section.active { display: block; }
+
+    /* ---- HEADER ---- */
+    .app-header {
+      background: var(--ink); color: white;
+      padding: 16px 20px 14px;
+    }
+    .app-header-inner { max-width: 700px; margin: 0 auto; }
+    .app-header-top {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 8px;
+    }
+    .app-title {
+      font-family: var(--serif); font-size: 1.3rem;
+      font-weight: 900; letter-spacing: 0.15em; color: #f5ead8;
+    }
+    .app-subtitle { font-size: 0.68rem; color: rgba(255,255,255,0.45); letter-spacing: 0.15em; }
+    .btn-back {
+      font-size: 0.75rem; color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 100px; padding: 5px 14px; cursor: pointer;
+      font-family: var(--sans); letter-spacing: 0.1em;
+      transition: background 0.2s;
+    }
+    .btn-back:hover { background: rgba(255,255,255,0.15); }
+
+    .header-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 10px 0; }
+
+    .honmei-strip {
+      display: flex; flex-wrap: wrap; gap: 8px 20px;
+      font-size: 0.75rem; color: rgba(255,255,255,0.55);
+    }
+    .honmei-strip .hs-label { color: rgba(255,255,255,0.35); }
+    .honmei-strip .hs-val   { color: #f5ead8; font-weight: 700; font-family: var(--serif); }
+    .honmei-strip .hs-star  { color: var(--cha-light); font-family: var(--serif); font-size: 0.85rem; }
+
+    /* ---- BODY ---- */
+    .app-body { max-width: 700px; margin: 0 auto; padding: 20px 16px 60px; }
+
+    /* ---- MONTH NAV ---- */
+    .month-nav {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-bottom: 18px;
+    }
+    .nav-btn {
+      background: white; border: 1px solid var(--parchment);
+      border-radius: 100px; width: 44px; height: 44px;
+      font-size: 1.2rem; cursor: pointer; color: var(--ink-mid);
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s; box-shadow: 0 1px 4px rgba(42,33,24,0.06);
+      font-family: var(--sans);
+    }
+    .nav-btn:hover { background: var(--cream); }
+    .nav-btn.year { font-size: 0.9rem; letter-spacing: -0.05em; }
+    .month-display {
+      font-family: var(--serif); font-size: 1.5rem; font-weight: 700;
+      color: var(--ink); min-width: 160px; text-align: center;
+      letter-spacing: 0.08em;
+    }
+
+    /* ---- LEGEND ---- */
+    .legend {
+      display: flex; gap: 16px; justify-content: center;
+      margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: var(--ink-light); }
+    .legend-dot { width: 14px; height: 14px; border-radius: 3px; }
+
+    /* ---- COMPASS GRID ---- */
+    .compass-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 6px; margin-bottom: 20px;
+    }
+
+    .cell {
+      border-radius: var(--r-sm); padding: 14px 8px;
+      text-align: center; cursor: pointer;
+      transition: transform 0.12s, box-shadow 0.12s;
+      min-height: 110px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+      border: 1px solid transparent; position: relative;
+    }
+    .cell:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(42,33,24,0.12); }
+    .cell.great { background: #fffbea; border-color: #c9a010; border-width: 1.5px; }
+    .cell.good  { background: var(--wakakusa-pale); border-color: #b8d8b0; }
+    .cell.bad   { background: var(--sakura-pale);   border-color: #f0c8d4; }
+    .cell.neutral { background: white; border-color: var(--parchment); }
+    .cell.center-cell {
+      background: #fdf5e4; border: 1.5px solid #d4b880;
+      cursor: default;
+    }
+    .cell.center-cell:hover { transform: none; box-shadow: none; }
+
+    .cell-dir {
+      font-family: var(--serif); font-size: 1.3rem;
+      font-weight: 700; color: var(--ink);
+    }
+    .cell-star { font-size: 0.72rem; color: var(--ink-light); margin-top: 1px; }
+
+    .kill-badge {
+      font-size: 0.66rem; font-weight: 700; padding: 2px 7px;
+      border-radius: 100px; margin-top: 3px; white-space: nowrap;
+    }
+    .kill-badge.great { background: rgba(201,160,16,0.15); color: #7a5f00; border: 1px solid rgba(201,160,16,0.3); }
+    .kill-badge.bad  { background: rgba(181,54,42,0.12); color: var(--red-ko); }
+    .kill-badge.good { background: rgba(122,171,106,0.18); color: var(--green-ko); }
+
+    .center-inner { text-align: center; }
+    .center-label { font-size: 0.62rem; color: var(--cha-light); letter-spacing: 0.08em; margin-bottom: 4px; }
+    .center-star  { font-family: var(--serif); font-size: 1.1rem; font-weight: 700; color: var(--cha); }
+    .center-month { font-size: 0.62rem; color: var(--ink-light); margin-top: 2px; }
+
+    /* ---- DETAIL PANEL ---- */
+    .detail-panel {
+      display: none; background: white;
+      border: 1px solid var(--parchment); border-radius: var(--r);
+      padding: 20px 22px; margin-bottom: 20px;
+      box-shadow: 0 2px 12px rgba(42,33,24,0.08);
+    }
+    .detail-panel.show { display: block; }
+
+    .detail-head {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 12px;
+    }
+    .detail-dir-name {
+      font-family: var(--serif); font-size: 1.35rem;
+      font-weight: 700; color: var(--ink);
+    }
+    .detail-star-name { font-size: 0.82rem; color: var(--ink-light); margin-top: 2px; }
+    .close-btn {
+      background: none; border: none; font-size: 1.2rem;
+      cursor: pointer; color: var(--ink-light); padding: 4px;
+      line-height: 1;
+    }
+    .close-btn:hover { color: var(--ink); }
+
+    .status-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .status-badge {
+      font-size: 0.78rem; font-weight: 700; padding: 4px 12px;
+      border-radius: 100px;
+    }
+    .status-badge.great { background: rgba(201,160,16,0.12); color: #7a5f00; border: 1px solid rgba(201,160,16,0.25); }
+    .status-badge.bad  { background: rgba(181,54,42,0.1); color: var(--red-ko); border: 1px solid rgba(181,54,42,0.2); }
+    .status-badge.good { background: rgba(122,171,106,0.15); color: var(--green-ko); border: 1px solid rgba(122,171,106,0.25); }
+
+    .detail-section { margin-top: 16px; }
+    .detail-section-label {
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.2em;
+      color: var(--cha-light); margin-bottom: 8px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--parchment);
+    }
+
+    .meaning-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+    .meaning-tag {
+      background: var(--cream); border: 1px solid var(--parchment);
+      border-radius: 4px; padding: 4px 12px;
+      font-size: 0.82rem; color: var(--ink);
+    }
+
+    .advice-box {
+      background: var(--wakakusa-pale); border-left: 3px solid var(--wakakusa);
+      padding: 12px 14px; border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      font-size: 0.9rem; line-height: 1.8; color: var(--ink-mid);
+      margin-top: 4px;
+    }
+
+    /* ---- TIPS ---- */
+    .tips-box {
+      background: #fdf5e4; border: 1px solid #d4b880;
+      border-radius: var(--r); padding: 18px 20px; margin-bottom: 8px;
+    }
+    .tips-title {
+      font-family: var(--serif); font-size: 0.82rem;
+      font-weight: 700; color: var(--cha); letter-spacing: 0.1em;
+      margin-bottom: 12px;
+    }
+    .tip-item {
+      font-size: 0.85rem; color: var(--ink-mid); line-height: 1.9;
+      padding-left: 1.2em; text-indent: -1.2em;
+    }
+    .tip-icon { color: var(--wakakusa); margin-right: 4px; }
+
+    /* ---- FOOTER ---- */
+    .app-footer {
+      text-align: center; font-size: 0.7rem;
+      color: var(--ink-light); padding: 1rem 0 2rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ---- RESPONSIVE ---- */
+    @media (max-width: 480px) {
+      .form-card { padding: 24px 20px 28px; }
+      .cell { min-height: 95px; padding: 10px 4px; }
+      .cell-dir { font-size: 1.1rem; }
+      .kill-badge { font-size: 0.6rem; padding: 2px 5px; }
+      .month-display { font-size: 1.3rem; min-width: 130px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== FORM ========== -->
+<section id="form-section">
+  <div class="form-masthead">
+    <p class="tagline">講座「占いから学ぶ 暮らしの知恵（入門編）」第3回</p>
+    <div class="hanabana"><span class="hanabana-icon">✿</span></div>
+    <h1>気学方位コース-1</h1>
+    <p class="sub">kigaku-Direction-course-1　｜　九星気学 吉方位アプリ</p>
+  </div>
+
+  <div class="form-card">
+    <h2>✦ はじめに情報を入力してください ✦</h2>
+
+    <div class="field">
+      <label>生年月日 <span class="req">必須</span></label>
+      <input type="date" id="inp-dob" value="1960-01-15" min="1926-02-01" max="2060-12-15" />
+    </div>
+
+
+    <button class="btn-primary" onclick="startApp()">✦ 吉方位盤を表示する ✦</button>
+  </div>
+</section>
+
+<!-- ========== RESULT ========== -->
+<section id="result-section">
+  <div class="app-header">
+    <div class="app-header-inner">
+      <div class="app-header-top">
+        <div>
+          <div class="app-title">気学方位コース-1</div>
+          <div class="app-subtitle">kigaku-Direction-course-1　九星気学 吉方位アプリ</div>
+        </div>
+        <button class="btn-back" onclick="goBack()">← やり直す</button>
+      </div>
+      <div class="header-divider"></div>
+      <div class="honmei-strip" id="honmeiStrip"></div>
+    </div>
+  </div>
+
+  <div class="app-body">
+
+    <!-- Month navigation -->
+    <div class="month-nav">
+      <button class="nav-btn year" title="前年" onclick="changeYear(-1)">«</button>
+      <button class="nav-btn" title="前月" onclick="changeMonth(-1)">‹</button>
+      <div class="month-display" id="monthDisplay">2026年7月</div>
+      <button class="nav-btn" title="翌月" onclick="changeMonth(1)">›</button>
+      <button class="nav-btn year" title="翌年" onclick="changeYear(1)">»</button>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#fde68a; border:1px solid #c9a010;"></div>大吉
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#b8d8b0;"></div>吉
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#f0c8d4;"></div>凶（六大方殺）
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:white; border:1px solid #ede4d2;"></div>普通
+      </div>
+    </div>
+
+    <!-- Compass grid -->
+    <div class="compass-grid" id="compassGrid"></div>
+
+    <!-- Detail panel -->
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-head">
+        <div>
+          <div class="detail-dir-name" id="detailDirName"></div>
+          <div class="detail-star-name" id="detailStarName"></div>
+        </div>
+        <button class="close-btn" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="status-badges" id="detailBadges"></div>
+      <div class="detail-section">
+        <div class="detail-section-label">この方位の象意</div>
+        <div class="meaning-tags" id="detailMeanings"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-label">おすすめ行動</div>
+        <div class="advice-box" id="detailAdvice"></div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips-box">
+      <div class="tips-title">◉ 初心者のための方位活用ガイド</div>
+      <p class="tip-item"><span class="tip-icon">◎</span>赤い方位（六大方殺）は、お出かけや引越しを避けましょう。</p>
+      <p class="tip-item"><span class="tip-icon">◎</span>金色の方位が<strong>大吉</strong>、緑の方位が<strong>吉</strong>です。大吉を優先して活用しましょう。</p>
+      <p class="tip-item"><span class="tip-icon">◎</span>吉方位の象意を意識して行動すると、その方位のよい気を受け取れます。</p>
+      <p class="tip-item"><span class="tip-icon">◎</span>方位をクリック（タップ）すると、象意とおすすめ行動が表示されます。</p>
+    </div>
+
+    <div class="app-footer">気学方位コース-1 ｜ 講座「占いから学ぶ 暮らしの知恵（入門編）」第3回「方位の読み方」</div>
+  </div>
+</section>
+
+<!-- db.js を同じフォルダに置いてください -->
+<script src="db.js"></script>
+<script>
+'use strict';
+
+/* ===== 定数 ===== */
+var STARS = ['一白水星','二黒土星','三碧木星','四縁木星','五黄土星','六白金星','七赤金星','八白土星','九紫火星'];
+
+/* 後天定位 — 中宮が何番のとき、その数字はどの方位に回座するか */
+var FIXED_POS = { 1:'北', 2:'南西', 3:'東', 4:'南東', 5:'中', 6:'北西', 7:'西', 8:'北東', 9:'南' };
+
+/* 対宮 */
+var OPPOSITE = { '北':'南','南':'北','東':'西','西':'東','北東':'南西','南西':'北東','北西':'南東','南東':'北西' };
+
+/* 象意・行動 */
+var DIR_INFO = {
+  '北':  { words:['信頼','蓄える','秘密','健康','睡眠','静養','腎臓'], advice:'ゆっくり休養し、自分の内面を見つめ直しましょう。信頼できる人との絆を深める時です。水分をよく摂り、健康を意識した行動も効果的です。' },
+  '北東':{ words:['変化','蓄財','不動産','整理整頓','転換','終わりと始まり'], advice:'部屋の片付けや模様替えをしてみましょう。新しいことへの切り替えや、整理整頓が吉。財産に関する整理も好機です。' },
+  '東':  { words:['発展','若さ','行動','スタート','独立','音楽','長男'], advice:'新しいことを始めましょう。朝早く起きて積極的に行動することで、よい気を受け取れます。音楽を聴いたり、新しいチャレンジを。' },
+  '南東':{ words:['縁談','信用','旅行','通信','商売繁盛','長女'], advice:'人との出会いや交流を大切にしましょう。手紙・メール・SNSで連絡を取ることも吉。旅行の計画にも適した方位です。' },
+  '南':  { words:['学問','美容','情報','名誉','直感','文書','礼儀'], advice:'勉強・資格・情報収集がおすすめです。自分磨きや美容に時間を使いましょう。直感を大切に、アイデアをメモする習慣を。' },
+  '南西':{ words:['勤勉','家庭','地道','忍耐','農業','飲食','母'], advice:'家事や地道な作業に取り組みましょう。家族との時間を大切にする日です。コツコツとした積み重ねが実を結びます。' },
+  '西':  { words:['金運','楽しみ','恋愛','飲食','収穫','決算','少女'], advice:'美味しい食事や好きなことを楽しみましょう。金運を意識した行動も効果的。大切な人との食事・会食に最適な方位です。' },
+  '北西':{ words:['統率','出世','父親','天','品格','旅行','リーダー'], advice:'リーダーシップを発揮しましょう。目上の方との交流や、ビジネスの場で力を発揮できます。品格を意識した行動が吉。' },
+};
+
+/* ===== 相剋チェックテーブル ===== */
+var AUKYO_TABLE = {
+  '一白水星': { great: ['六白金星','七赤金星'], good: ['三碧木星','四縁木星'] },
+  '二黒土星': { great: ['九紫火星'],            good: ['八白土星','六白金星','七赤金星'] },
+  '三碧木星': { great: ['一白水星'],            good: ['九紫火星','四縁木星'] },
+  '四縁木星': { great: ['一白水星'],            good: ['九紫火星','三碧木星'] },
+  '五黄土星': { great: ['九紫火星'],            good: ['二黒土星','八白土星','六白金星','七赤金星'] },
+  '六白金星': { great: ['二黒土星','八白土星'], good: ['一白水星','七赤金星'] },
+  '七赤金星': { great: ['二黒土星','八白土星'], good: ['一白水星','六白金星'] },
+  '八白土星': { great: ['九紫火星'],            good: ['二黒土星','六白金星','七赤金星'] },
+  '九紫火星': { great: ['三碧木星','四縁木星'], good: ['二黒土星','八白土星'] },
+};
+
+/* 吉凶レベルを返す: 'great' | 'good' | 'neutral' */
+function getAuspiciousLevel(honmei, starAtDirection) {
+  var table = AUKYO_TABLE[honmei];
+  if (!table) return 'neutral';
+  if (table.great.indexOf(starAtDirection) >= 0) return 'great';
+  if (table.good.indexOf(starAtDirection) >= 0)  return 'good';
+  return 'neutral';
+}
+
+
+var currentYear = 2026, currentMonth = 7;
+var honmeiStar = '', tsukimeiStar = '';
+
+/* ===== DB から本命星・月命星を引く ===== */
+function lookupDB(dateStr) {
+  var parts = dateStr.split('-');
+  var key = parts[0] + '/' + parts[1] + '/' + parts[2];
+  if (typeof KIGAKU_DB !== 'undefined' && KIGAKU_DB[key]) {
+    var d = KIGAKU_DB[key];
+    return { nenKyusei: d[0], tsuKyusei: d[3] };
+  }
+  return null;
+}
+
+/* 対象年月の月命星をDBから引く（その月の15日あたりで代表） */
+function getMonthStar(year, month) {
+  var mm = String(month).padStart(2,'0');
+  var key = year + '/' + mm + '/23';
+  if (typeof KIGAKU_DB !== 'undefined' && KIGAKU_DB[key]) {
+    return KIGAKU_DB[key][3]; // tsuKyusei = 月の中宮星
+  }
+  /* フォールバック: 簡易計算 */
+  var base = ((year - 1900) * 12 + (month - 2)) % 9;
+  var n = (9 - base % 9) % 9; if (n === 0) n = 9;
+  return STARS[n - 1];
+}
+
+/* ===== 方位計算 ===== */
+function starNumOf(name) {
+  var idx = STARS.indexOf(name);
+  return idx >= 0 ? idx + 1 : 0;
+}
+
+/* 中宮の数字が monthCenter のとき、各方位に座っている星の名前を返す */
+function starAtDir(monthCenterNum, dir) {
+  /* FIXED_POS[n] = dir  →  逆引きで方位→定位置番号 */
+  var fixedNum = null;
+  for (var n in FIXED_POS) {
+    if (FIXED_POS[n] === dir) { fixedNum = parseInt(n); break; }
+  }
+  if (fixedNum === null) return '';
+  /* 中宮を5として、回座後の星番号を計算 */
+  var starNum = fixedNum - 5 + monthCenterNum;
+  while (starNum < 1) starNum += 9;
+  while (starNum > 9) starNum -= 9;
+  return STARS[starNum - 1];
+}
+
+/* 六大方殺の判定 */
+function getKills(dir, monthCenterNum) {
+  var honmeiNum  = starNumOf(honmeiStar);
+  var tsukimeiNum = starNumOf(tsukimeiStar);
+  var star    = starAtDir(monthCenterNum, dir);
+  var oppDir  = OPPOSITE[dir];
+  var oppStar = oppDir ? starAtDir(monthCenterNum, oppDir) : '';
+  var starNum    = starNumOf(star);
+  var oppStarNum = starNumOf(oppStar);
+
+  var kills = [];
+  if (starNum === 5)           kills.push('五黄殺');
+  if (oppStarNum === 5)        kills.push('暗剣殺');
+  if (starNum === honmeiNum)   kills.push('本命殺');
+  if (oppStarNum === honmeiNum) kills.push('本命的殺');
+  if (starNum === tsukimeiNum)  kills.push('月命殺');
+  if (oppStarNum === tsukimeiNum) kills.push('月命的殺');
+  return { star: star, kills: kills };
+}
+
+/* ===== 方位盤描画 ===== */
+/* グリッドの並び（左上→右下, 北が上ではなく南が上の後天定位に合わせた表示） */
+var LAYOUT = [
+  'south-east', 'south',   'south-west',
+  'east',       'center',  'west',
+  'north-east', 'north',   'north-west'
+];
+var DIR_MAP = {
+  'south-east':'南東','south':'南','south-west':'南西',
+  'east':'東','center':'中','west':'西',
+  'north-east':'北東','north':'北','north-west':'北西'
+};
+
+function updateBoard() {
+  document.getElementById('monthDisplay').textContent = currentYear + '年' + currentMonth + '月';
+
+  /* 月命星を今表示中の年月から取得（正確にDBから引く） */
+  var monthCenterStr = getMonthStar(currentYear, currentMonth);
+  var monthCenterNum = starNumOf(monthCenterStr);
+
+  var grid = document.getElementById('compassGrid');
+  grid.innerHTML = '';
+
+  LAYOUT.forEach(function(key) {
+    var dir = DIR_MAP[key];
+    var cell = document.createElement('div');
+    cell.className = 'cell';
+
+    if (dir === '中') {
+      cell.classList.add('center-cell');
+      cell.innerHTML =
+        '<div class="center-inner">' +
+        '<div class="center-label">今月の中宮星</div>' +
+        '<div class="center-star">' + monthCenterStr + '</div>' +
+        '<div class="center-month">' + currentYear + '年' + currentMonth + '月</div>' +
+        '<div style="font-size:0.6rem;color:#9a8a6a;margin-top:4px;">本命星：' + honmeiStar + '</div>' +
+        '</div>';
+    } else {
+      var result = getKills(dir, monthCenterNum);
+      var hasBad = result.kills.length > 0;
+
+      /* 相剋チェック（凶でない場合のみ） */
+      var auspLevel = 'neutral';
+      if (!hasBad) {
+        auspLevel = getAuspiciousLevel(honmeiStar, result.star);
+      }
+
+      var cellClass = hasBad ? 'bad' : (auspLevel === 'great' ? 'great' : (auspLevel === 'good' ? 'good' : 'neutral'));
+      cell.classList.add(cellClass);
+
+      var badgesHtml = '';
+      if (hasBad) {
+        result.kills.forEach(function(k) {
+          badgesHtml += '<span class="kill-badge bad">' + k + '</span>';
+        });
+      } else if (auspLevel === 'great') {
+        badgesHtml = '<span class="kill-badge great">大吉</span>';
+      } else if (auspLevel === 'good') {
+        badgesHtml = '<span class="kill-badge good">吉</span>';
+      }
+
+      cell.innerHTML =
+        '<div class="cell-dir">' + dir + '</div>' +
+        '<div class="cell-star">' + result.star + '</div>' +
+        badgesHtml;
+
+      (function(d, s, k, b, lv) {
+        cell.addEventListener('click', function() {
+          showDetail(d, s, k, b, lv);
+        });
+      })(dir, result.star, result.kills, hasBad, auspLevel);
+    }
+
+    grid.appendChild(cell);
+  });
+
+  closeDetail();
+}
+
+/* ===== 詳細パネル ===== */
+function showDetail(dir, star, kills, isBad, auspLevel) {
+  document.getElementById('detailDirName').textContent = dir;
+  document.getElementById('detailStarName').textContent = star;
+
+  var badgesEl = document.getElementById('detailBadges');
+  if (isBad) {
+    badgesEl.innerHTML = kills.map(function(k) {
+      return '<span class="status-badge bad">' + k + '</span>';
+    }).join('');
+  } else if (auspLevel === 'great') {
+    badgesEl.innerHTML = '<span class="status-badge great">大吉方位</span>';
+  } else if (auspLevel === 'good') {
+    badgesEl.innerHTML = '<span class="status-badge good">吉方位</span>';
+  } else {
+    badgesEl.innerHTML = '<span class="status-badge" style="background:var(--cream);color:var(--ink-light);border:1px solid var(--parchment);">普通</span>';
+  }
+
+  var info = DIR_INFO[dir] || { words: [], advice: 'この方位の詳細情報は準備中です。' };
+  document.getElementById('detailMeanings').innerHTML =
+    info.words.map(function(w) { return '<span class="meaning-tag">' + w + '</span>'; }).join('');
+  document.getElementById('detailAdvice').textContent = info.advice;
+
+  var panel = document.getElementById('detailPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeDetail() {
+  document.getElementById('detailPanel').classList.remove('show');
+}
+
+/* ===== 月・年移動 ===== */
+function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  if (currentMonth < 1)  { currentMonth = 12; currentYear--; }
+  updateBoard();
+}
+function changeYear(delta) {
+  currentYear += delta;
+  updateBoard();
+}
+
+/* ===== アプリ起動 ===== */
+function startApp() {
+  var dobStr  = document.getElementById('inp-dob').value;
+
+  if (!dobStr) { alert('生年月日を入力してください'); return; }
+
+  var rec = lookupDB(dobStr);
+  if (!rec) {
+    alert('この生年月日はデータベースに見つかりませんでした。\n対応範囲: 1926年〜2060年');
+    return;
+  }
+
+  honmeiStar  = rec.nenKyusei;
+  tsukimeiStar = rec.tsuKyusei;
+
+  var today = new Date();
+  currentYear  = today.getFullYear();
+  currentMonth = today.getMonth() + 1;
+
+  var dob = new Date(dobStr + 'T00:00:00');
+  var age = today.getFullYear() - dob.getFullYear();
+  var md  = today.getMonth() - dob.getMonth();
+  if (md < 0 || (md === 0 && today.getDate() < dob.getDate())) age--;
+  var dobDisp = dob.getFullYear() + '年' + (dob.getMonth()+1) + '月' + dob.getDate() + '日';
+
+  document.getElementById('honmeiStrip').innerHTML =
+    '<span><span class="hs-label">生年月日 </span><span class="hs-val">' + dobDisp + '　' + age + '歳</span></span>' +
+    '<span><span class="hs-label">本命星 </span><span class="hs-star">' + honmeiStar + '</span></span>' +
+    '<span><span class="hs-label">月命星 </span><span class="hs-star">' + tsukimeiStar + '</span></span>';
+
+  document.getElementById('form-section').style.display = 'none';
+  document.getElementById('result-section').classList.add('active');
+  window.scrollTo(0, 0);
+  updateBoard();
+}
+
+function goBack() {
+  document.getElementById('result-section').classList.remove('active');
+  document.getElementById('form-section').style.display = 'flex';
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
