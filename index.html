@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>気学方位コース-1 ｜ 吉方位アプリ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --washi:#faf6ef; --cream:#f5efe2; --parchment:#ede4d2;
+      --cha:#9b7345; --cha-light:#c9a87c; --ink:#2a2118;
+      --ink-mid:#5a4a38; --ink-light:#8a7a68; --gold:#b07d38;
+      --serif:'Noto Serif JP','Hiragino Mincho ProN',serif;
+      --sans:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;
+      --r:14px; --r-sm:8px;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:var(--sans);background:var(--washi);color:var(--ink);min-height:100vh;line-height:1.7;}
+    body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+      background-image:radial-gradient(circle at 15% 20%,rgba(232,165,184,0.07) 0%,transparent 50%),radial-gradient(circle at 85% 75%,rgba(122,171,106,0.07) 0%,transparent 50%);}
+
+    #form-section{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;}
+    .form-masthead{text-align:center;margin-bottom:36px;}
+    .form-masthead .tagline{font-size:0.78rem;letter-spacing:0.3em;color:var(--cha-light);margin-bottom:8px;}
+    .form-masthead h1{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.8rem);font-weight:900;letter-spacing:0.2em;color:var(--ink);line-height:1.2;}
+    .form-masthead .sub{margin-top:8px;font-size:0.82rem;color:var(--ink-light);letter-spacing:0.15em;}
+    .hanabana{display:flex;align-items:center;gap:12px;justify-content:center;margin:14px 0;}
+    .hanabana::before{content:'';display:block;width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--cha-light));}
+    .hanabana::after{content:'';display:block;width:60px;height:1px;background:linear-gradient(90deg,var(--cha-light),transparent);}
+    .hanabana-icon{color:#e8a5b8;font-size:1.1rem;}
+    .form-card{width:100%;max-width:440px;background:white;border:1px solid var(--parchment);border-radius:var(--r);padding:36px 36px 40px;box-shadow:0 2px 8px rgba(42,33,24,0.05),0 12px 40px rgba(42,33,24,0.08);}
+    .form-card h2{font-family:var(--serif);font-size:0.88rem;letter-spacing:0.25em;color:var(--cha);text-align:center;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid var(--parchment);}
+    .field{margin-bottom:20px;}
+    .field label{display:block;font-size:0.82rem;font-weight:700;color:var(--ink-mid);letter-spacing:0.08em;margin-bottom:7px;}
+    .req{display:inline-block;font-size:0.65rem;font-weight:400;color:#b5362a;background:rgba(181,54,42,0.08);padding:1px 5px;border-radius:3px;margin-left:6px;}
+    .field input{width:100%;padding:13px 14px;border:1px solid var(--parchment);border-radius:var(--r-sm);background:var(--washi);font-family:var(--sans);font-size:1rem;color:var(--ink);outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+    .field input:focus{border-color:var(--cha-light);box-shadow:0 0 0 3px rgba(176,125,56,0.12);}
+    .btn-primary{display:block;width:100%;padding:16px;background:var(--ink);color:#f5ead8;border:none;border-radius:var(--r-sm);font-family:var(--serif);font-size:1.05rem;font-weight:700;letter-spacing:0.3em;cursor:pointer;margin-top:28px;transition:background 0.2s,transform 0.15s;}
+    .btn-primary:hover{background:var(--cha);transform:translateY(-1px);}
+
+    #result-section{display:none;position:relative;z-index:1;}
+    #result-section.active{display:block;}
+    .app-header{background:var(--ink);color:white;padding:16px 20px 14px;}
+    .app-header-inner{max-width:700px;margin:0 auto;}
+    .app-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+    .app-title{font-family:var(--serif);font-size:1.3rem;font-weight:900;letter-spacing:0.15em;color:#f5ead8;}
+    .app-subtitle{font-size:0.68rem;color:rgba(255,255,255,0.45);letter-spacing:0.15em;}
+    .btn-back{font-size:0.75rem;color:rgba(255,255,255,0.55);background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:100px;padding:5px 14px;cursor:pointer;font-family:var(--sans);letter-spacing:0.1em;transition:background 0.2s;}
+    .btn-back:hover{background:rgba(255,255,255,0.15);}
+    .header-divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:10px 0;}
+    .honmei-strip{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:0.75rem;color:rgba(255,255,255,0.55);}
+    .honmei-strip .hs-label{color:rgba(255,255,255,0.35);}
+    .honmei-strip .hs-val{color:#f5ead8;font-weight:700;font-family:var(--serif);}
+    .honmei-strip .hs-star{color:var(--cha-light);font-family:var(--serif);font-size:0.85rem;}
+
+    .app-body{max-width:700px;margin:0 auto;padding:20px 16px 60px;}
+    .month-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:18px;}
+    .nav-btn{background:white;border:1px solid var(--parchment);border-radius:100px;width:44px;height:44px;font-size:1.2rem;cursor:pointer;color:var(--ink-mid);display:flex;align-items:center;justify-content:center;transition:background 0.15s;box-shadow:0 1px 4px rgba(42,33,24,0.06);font-family:var(--sans);}
+    .nav-btn:hover{background:var(--cream);}
+    .nav-btn.year{font-size:0.9rem;}
+    .month-display{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--ink);min-width:160px;text-align:center;letter-spacing:0.08em;}
+
+    .legend{display:flex;gap:12px 18px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;}
+    .legend-item{display:flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--ink-light);}
+    .legend-dot{width:14px;height:14px;border-radius:3px;}
+
+    .compass-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:20px;}
+    .cell{border-radius:var(--r-sm);padding:14px 8px;text-align:center;cursor:pointer;transition:transform 0.12s,box-shadow 0.12s;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px solid transparent;}
+    .cell:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(42,33,24,0.12);}
+    .cell.great  {background:#fff3e0;border-color:#f5a623;border-width:1.5px;}
+    .cell.good   {background:#fdeef3;border-color:#f0a8bf;}
+    .cell.bad    {background:#eeeeee;border-color:#aaaaaa;}
+    .cell.clash  {background:#f0f0f0;border-color:#bbbbbb;}
+    .cell.neutral{background:white;border-color:var(--parchment);}
+    .cell.center-cell{background:#fdf5e4;border:1.5px solid #d4b880;cursor:default;}
+    .cell.center-cell:hover{transform:none;box-shadow:none;}
+    .cell-dir{font-family:var(--serif);font-size:1.3rem;font-weight:700;color:var(--ink);}
+    .cell-star{font-size:0.72rem;color:var(--ink-light);margin-top:1px;}
+    .kill-badge{font-size:0.64rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-top:3px;white-space:nowrap;}
+    .kill-badge.great{background:rgba(245,166,35,0.2);color:#a05000;border:1px solid rgba(245,166,35,0.4);}
+    .kill-badge.good {background:rgba(230,100,140,0.15);color:#9a2060;}
+    .kill-badge.bad  {background:rgba(100,100,100,0.15);color:#444444;}
+    .kill-badge.clash{background:rgba(120,120,120,0.15);color:#555555;}
+
+    .detail-panel{display:none;background:white;border:1px solid var(--parchment);border-radius:var(--r);padding:20px 22px;margin-bottom:20px;box-shadow:0 2px 12px rgba(42,33,24,0.08);}
+    .detail-panel.show{display:block;}
+    .detail-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+    .detail-dir-name{font-family:var(--serif);font-size:1.35rem;font-weight:700;color:var(--ink);}
+    .detail-star-name{font-size:0.82rem;color:var(--ink-light);margin-top:2px;}
+    .close-btn{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--ink-light);padding:4px;line-height:1;}
+    .status-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+    .status-badge{font-size:0.78rem;font-weight:700;padding:4px 12px;border-radius:100px;}
+    .status-badge.great {background:rgba(245,166,35,0.15);color:#a05000;border:1px solid rgba(245,166,35,0.35);}
+    .status-badge.good  {background:rgba(230,100,140,0.12);color:#9a2060;border:1px solid rgba(230,100,140,0.3);}
+    .status-badge.bad   {background:rgba(100,100,100,0.1);color:#444444;border:1px solid rgba(100,100,100,0.25);}
+    .status-badge.clash {background:rgba(120,120,120,0.1);color:#555555;border:1px solid rgba(120,120,120,0.25);}
+    .status-badge.neutral{background:var(--cream);color:var(--ink-light);border:1px solid var(--parchment);}
+    .detail-section{margin-top:16px;}
+    .detail-section-label{font-size:0.68rem;font-weight:700;letter-spacing:0.2em;color:var(--cha-light);margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--parchment);}
+    .meaning-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;}
+    .meaning-tag{background:var(--cream);border:1px solid var(--parchment);border-radius:4px;padding:4px 12px;font-size:0.82rem;color:var(--ink);}
+    .advice-box{background:#eaf4e5;border-left:3px solid #7aab6a;padding:12px 14px;border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:0.9rem;line-height:1.8;color:var(--ink-mid);margin-top:4px;}
+
+    .tips-box{background:#fdf5e4;border:1px solid #d4b880;border-radius:var(--r);padding:18px 20px;margin-bottom:8px;}
+    .tips-title{font-family:var(--serif);font-size:0.82rem;font-weight:700;color:var(--cha);letter-spacing:0.1em;margin-bottom:12px;}
+    .tip-item{font-size:0.85rem;color:var(--ink-mid);line-height:1.9;padding-left:1.2em;text-indent:-1.2em;}
+    .tip-icon{color:#7aab6a;margin-right:4px;}
+    .app-footer{text-align:center;font-size:0.7rem;color:var(--ink-light);padding:1rem 0 2rem;letter-spacing:0.1em;}
+    .center-inner{text-align:center;}
+    .center-label{font-size:0.62rem;color:var(--cha-light);letter-spacing:0.08em;margin-bottom:4px;}
+    .center-star{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--cha);}
+    .center-month{font-size:0.62rem;color:var(--ink-light);margin-top:2px;}
+    @media(max-width:480px){
+      .form-card{padding:24px 20px 28px;}
+      .cell{min-height:95px;padding:10px 4px;}
+      .cell-dir{font-size:1.1rem;}
+      .kill-badge{font-size:0.6rem;padding:2px 5px;}
+      .month-display{font-size:1.3rem;min-width:130px;}
+    }
+  </style>
+</head>
+<body>
+
+<section id="form-section">
+  <div class="form-masthead">
+    <p class="tagline">講座「占いから学ぶ 暮らしの知恵（入門編）」第3回</p>
+    <div class="hanabana"><span class="hanabana-icon">✿</span></div>
+    <h1>気学方位コース-1</h1>
+    <p class="sub">kigaku-Direction-course-1　｜　九星気学 吉方位アプリ</p>
+  </div>
+  <div class="form-card">
+    <h2>✦ 生年月日を入力してください ✦</h2>
+    <div class="field">
+      <label>生年月日 <span class="req">必須</span></label>
+      <input type="date" id="inp-dob" value="1960-01-15" min="1926-02-01" max="2060-12-15" />
+    </div>
+    <button class="btn-primary" onclick="startApp()">✦ 吉方位盤を表示する ✦</button>
+  </div>
+</section>
+
+<section id="result-section">
+  <div class="app-header">
+    <div class="app-header-inner">
+      <div class="app-header-top">
+        <div>
+          <div class="app-title">気学方位コース-1</div>
+          <div class="app-subtitle">kigaku-Direction-course-1　九星気学 吉方位アプリ</div>
+        </div>
+        <button class="btn-back" onclick="goBack()">← やり直す</button>
+      </div>
+      <div class="header-divider"></div>
+      <div class="honmei-strip" id="honmeiStrip"></div>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <div class="month-nav">
+      <button class="nav-btn year" onclick="changeYear(-1)">«</button>
+      <button class="nav-btn" onclick="changeMonth(-1)">‹</button>
+      <div class="month-display" id="monthDisplay">2026年6月</div>
+      <button class="nav-btn" onclick="changeMonth(1)">›</button>
+      <button class="nav-btn year" onclick="changeYear(1)">»</button>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#ffe0b0;border:1px solid #f5a623;"></div>大吉</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fdeef3;border:1px solid #f0a8bf;"></div>吉</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#eeeeee;border:1px solid #aaaaaa;"></div>凶（六大方殺・歳破・月破）</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f0f0f0;border:1px solid #bbbbbb;"></div>相剋</div>
+      <div class="legend-item"><div class="legend-dot" style="background:white;border:1px solid #ede4d2;"></div>普通</div>
+    </div>
+
+    <div class="compass-grid" id="compassGrid"></div>
+
+    <div class="detail-panel" id="detailPanel">
+      <div class="detail-head">
+        <div>
+          <div class="detail-dir-name" id="detailDirName"></div>
+          <div class="detail-star-name" id="detailStarName"></div>
+        </div>
+        <button class="close-btn" onclick="closeDetail()">✕</button>
+      </div>
+      <div class="status-badges" id="detailBadges"></div>
+      <div class="detail-section">
+        <div class="detail-section-label">この方位の象意</div>
+        <div class="meaning-tags" id="detailMeanings"></div>
+      </div>
+      <div class="detail-section">
+        <div class="detail-section-label">おすすめ行動</div>
+        <div class="advice-box" id="detailAdvice"></div>
+      </div>
+    </div>
+
+    <div class="tips-box">
+      <div class="tips-title">◉ 初心者のための方位活用ガイド</div>
+      <p class="tip-item"><span class="tip-icon">◎</span>グレーの方位（凶・相剋）は避けましょう。吉は少なく、だからこそ貴重です。</p>
+      <p class="tip-item"><span class="tip-icon">◎</span>オレンジが<strong>大吉</strong>、ピンクが<strong>吉</strong>です。大吉を優先して活用しましょう。</p>
+      <p class="tip-item"><span class="tip-icon">◎</span>吉方位の象意を意識して行動すると、その方位のよい気を受け取れます。</p>
+      <p class="tip-item"><span class="tip-icon">◎</span>方位をクリック（タップ）すると、象意とおすすめ行動が表示されます。</p>
+    </div>
+    <div class="app-footer">気学方位コース-1 ｜ 講座「占いから学ぶ 暮らしの知恵（入門編）」第3回「方位の読み方」</div>
+  </div>
+</section>
+
+<script src="db.js"></script>
+<script>
+'use strict';
+
+var STARS=['一白水星','二黒土星','三碧木星','四縁木星','五黄土星','六白金星','七赤金星','八白土星','九紫火星'];
+var FIXED_POS={1:'北',2:'南西',3:'東',4:'南東',5:'中',6:'北西',7:'西',8:'北東',9:'南'};
+var OPPOSITE={'北':'南','南':'北','東':'西','西':'東','北東':'南西','南西':'北東','北西':'南東','南東':'北西'};
+var JUSHI_DIR={'子':'北','丑':'北東','寅':'北東','卯':'東','辰':'南東','巳':'南東','午':'南','未':'南西','申':'南西','酉':'西','戌':'北西','亥':'北西'};
+
+var DIR_INFO={
+  '北': {words:['信頼','蓄える','秘密','健康','睡眠','静養'],advice:'ゆっくり休養し、自分の内面を見つめ直しましょう。信頼できる人との絆を深める時です。'},
+  '北東':{words:['変化','蓄財','不動産','整理整頓','転換'],advice:'部屋の片付けや模様替えをしてみましょう。新しいことへの切り替えや整理整頓が吉です。'},
+  '東': {words:['発展','若さ','行動','スタート','独立','音楽'],advice:'新しいことを始めましょう。朝早く起きて積極的に行動することで、よい気を受け取れます。'},
+  '南東':{words:['縁談','信用','旅行','通信','商売繁盛'],advice:'人との出会いや交流を大切にしましょう。手紙・メール・SNSで連絡を取ることも吉です。'},
+  '南': {words:['学問','美容','情報','名誉','直感','文書'],advice:'勉強・資格・情報収集がおすすめです。自分磨きや美容に時間を使いましょう。'},
+  '南西':{words:['勤勉','家庭','地道','忍耐','農業','飲食'],advice:'家事や地道な作業に取り組みましょう。家族との時間を大切にする日です。'},
+  '西': {words:['金運','楽しみ','恋愛','飲食','収穫','決算'],advice:'美味しい食事や好きなことを楽しみましょう。金運を意識した行動も効果的です。'},
+  '北西':{words:['統率','出世','父親','天','品格','旅行'],advice:'リーダーシップを発揮しましょう。目上の方との交流やビジネスの場で力を発揮できます。'},
+};
+
+/* 相生テーブル */
+var SEISHO={
+  '一白水星':{great:['六白金星','七赤金星'],good:['三碧木星','四縁木星']},
+  '二黒土星':{great:['九紫火星'],good:['八白土星','六白金星','七赤金星']},
+  '三碧木星':{great:['一白水星'],good:['九紫火星','四縁木星']},
+  '四縁木星':{great:['一白水星'],good:['九紫火星','三碧木星']},
+  '五黄土星':{great:['九紫火星'],good:['二黒土星','八白土星','六白金星','七赤金星']},
+  '六白金星':{great:['二黒土星','八白土星'],good:['一白水星','七赤金星']},
+  '七赤金星':{great:['二黒土星','八白土星'],good:['一白水星','六白金星']},
+  '八白土星':{great:['九紫火星'],good:['二黒土星','六白金星','七赤金星']},
+  '九紫火星':{great:['三碧木星','四縁木星'],good:['二黒土星','八白土星']},
+};
+
+/* 相剋テーブル */
+var SOKOKU={
+  '一白水星':['九紫火星','二黒土星','八白土星','五黄土星'],
+  '二黒土星':['三碧木星','四縁木星','一白水星'],
+  '三碧木星':['二黒土星','八白土星','五黄土星','六白金星','七赤金星'],
+  '四縁木星':['二黒土星','八白土星','五黄土星','六白金星','七赤金星'],
+  '五黄土星':['三碧木星','四縁木星','一白水星'],
+  '六白金星':['三碧木星','四縁木星','九紫火星'],
+  '七赤金星':['三碧木星','四縁木星','九紫火星'],
+  '八白土星':['三碧木星','四縁木星','一白水星'],
+  '九紫火星':['六白金星','七赤金星','一白水星'],
+};
+
+var currentYear=2026, currentMonth=7;
+var honmeiStar='';
+
+function lookupDB(dateStr){
+  var p=dateStr.split('-');
+  var key=p[0]+'/'+p[1]+'/'+p[2];
+  if(typeof KIGAKU_DB!=='undefined'&&KIGAKU_DB[key]){
+    var d=KIGAKU_DB[key];
+    return{nenKyusei:d[0],tsuKyusei:d[3]};
+  }
+  return null;
+}
+
+function getYearData(year){
+  var key=year+'/02/15';
+  if(typeof KIGAKU_DB!=='undefined'&&KIGAKU_DB[key]){
+    return{nenKyusei:KIGAKU_DB[key][0],nenShi:KIGAKU_DB[key][2]};
+  }
+  return null;
+}
+
+function getMonthData(year,month){
+  var mm=String(month).padStart(2,'0');
+  var key=year+'/'+mm+'/23';
+  if(typeof KIGAKU_DB!=='undefined'&&KIGAKU_DB[key]){
+    return{tsuKyusei:KIGAKU_DB[key][3],tsuShi:KIGAKU_DB[key][5]};
+  }
+  return null;
+}
+
+function starNumOf(name){var i=STARS.indexOf(name);return i>=0?i+1:0;}
+
+function starAtDir(centerNum,dir){
+  var fixedNum=null;
+  for(var n in FIXED_POS){if(FIXED_POS[n]===dir){fixedNum=parseInt(n);break;}}
+  if(fixedNum===null)return'';
+  var s=fixedNum-5+centerNum;
+  while(s<1)s+=9; while(s>9)s-=9;
+  return STARS[s-1];
+}
+
+function getHaDir(shi){var d=JUSHI_DIR[shi];return d?OPPOSITE[d]:null;}
+
+function analyzeDir(dir,yearData,monthData){
+  var result={star:'',labels:[],level:'neutral'};
+  var yearCenterNum=starNumOf(yearData.nenKyusei);
+  var monthCenterNum=starNumOf(monthData.tsuKyusei);
+  var oppDir=OPPOSITE[dir];
+
+  /* 月盤のこの方位の星 */
+  result.star=starAtDir(monthCenterNum,dir);
+  var starNum=starNumOf(result.star);
+  var oppStarNum=oppDir?starNumOf(starAtDir(monthCenterNum,oppDir)):0;
+
+  /* 年盤のこの方位の星 */
+  var yearStarNum=starNumOf(starAtDir(yearCenterNum,dir));
+  var yearOppStarNum=oppDir?starNumOf(starAtDir(yearCenterNum,oppDir)):0;
+
+  var honmeiNum=starNumOf(honmeiStar);
+
+  /* 年盤の凶 */
+  if(yearStarNum===5)    result.labels.push('年五黄殺');
+  if(yearOppStarNum===5) result.labels.push('年暗剣殺');
+  var sahaDir=getHaDir(yearData.nenShi);
+  if(sahaDir&&sahaDir===dir) result.labels.push('歳破');
+
+  /* 月盤の凶 */
+  if(starNum===5)           result.labels.push('月五黄殺');
+  if(oppStarNum===5)        result.labels.push('月暗剣殺');
+  if(starNum===honmeiNum)   result.labels.push('本命殺');
+  if(oppStarNum===honmeiNum)result.labels.push('本命的殺');
+  var geppaDir=getHaDir(monthData.tsuShi);
+  if(geppaDir&&geppaDir===dir) result.labels.push('月破');
+
+  if(result.labels.length>0){result.level='bad';return result;}
+
+  /* 相剋チェック */
+  var sokoku=SOKOKU[honmeiStar]||[];
+  if(sokoku.indexOf(result.star)>=0){
+    result.labels.push('相剋');result.level='clash';return result;
+  }
+
+  /* 相生チェック */
+  var seisho=SEISHO[honmeiStar];
+  if(seisho){
+    if(seisho.great.indexOf(result.star)>=0){result.labels.push('大吉');result.level='great';return result;}
+    if(seisho.good.indexOf(result.star)>=0) {result.labels.push('吉'); result.level='good'; return result;}
+  }
+  return result;
+}
+
+var LAYOUT=['south-east','south','south-west','east','center','west','north-east','north','north-west'];
+var DIR_MAP={'south-east':'南東','south':'南','south-west':'南西','east':'東','center':'中','west':'西','north-east':'北東','north':'北','north-west':'北西'};
+
+function updateBoard(){
+  document.getElementById('monthDisplay').textContent=currentYear+'年'+currentMonth+'月';
+  var yearData=getYearData(currentYear);
+  var monthData=getMonthData(currentYear,currentMonth);
+  if(!yearData||!monthData){
+    document.getElementById('compassGrid').innerHTML='<p style="text-align:center;color:#888;padding:2rem;grid-column:1/-1;">この年月のデータがありません</p>';
+    return;
+  }
+  var grid=document.getElementById('compassGrid');
+  grid.innerHTML='';
+  LAYOUT.forEach(function(key){
+    var dir=DIR_MAP[key];
+    var cell=document.createElement('div');
+    cell.className='cell';
+    if(dir==='中'){
+      cell.classList.add('center-cell');
+      cell.innerHTML='<div class="center-inner"><div class="center-label">今月の中宮星</div><div class="center-star">'+monthData.tsuKyusei+'</div><div class="center-month">'+currentYear+'年'+currentMonth+'月</div><div style="font-size:0.6rem;color:#9a8a6a;margin-top:4px;">本命星：'+honmeiStar+'</div></div>';
+    }else{
+      var res=analyzeDir(dir,yearData,monthData);
+      cell.classList.add(res.level);
+      var cls=res.level==='great'?'great':res.level==='good'?'good':res.level==='clash'?'clash':'bad';
+      var badgesHtml=res.labels.map(function(lb){return'<span class="kill-badge '+cls+'">'+lb+'</span>';}).join('');
+      cell.innerHTML='<div class="cell-dir">'+dir+'</div><div class="cell-star">'+res.star+'</div>'+badgesHtml;
+      (function(d,r){cell.addEventListener('click',function(){showDetail(d,r);});})(dir,res);
+    }
+    grid.appendChild(cell);
+  });
+  closeDetail();
+}
+
+function showDetail(dir,res){
+  document.getElementById('detailDirName').textContent=dir;
+  document.getElementById('detailStarName').textContent=res.star;
+  var cls=res.level==='great'?'great':res.level==='good'?'good':res.level==='clash'?'clash':res.labels.length>0?'bad':'neutral';
+  var badgesEl=document.getElementById('detailBadges');
+  if(res.labels.length===0){
+    badgesEl.innerHTML='<span class="status-badge neutral">普通</span>';
+  }else{
+    badgesEl.innerHTML=res.labels.map(function(lb){return'<span class="status-badge '+cls+'">'+lb+'</span>';}).join('');
+  }
+  var info=DIR_INFO[dir]||{words:[],advice:'この方位の詳細情報は準備中です。'};
+  document.getElementById('detailMeanings').innerHTML=info.words.map(function(w){return'<span class="meaning-tag">'+w+'</span>';}).join('');
+  document.getElementById('detailAdvice').textContent=info.advice;
+  var panel=document.getElementById('detailPanel');
+  panel.classList.add('show');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeDetail(){document.getElementById('detailPanel').classList.remove('show');}
+function changeMonth(d){currentMonth+=d;if(currentMonth>12){currentMonth=1;currentYear++;}if(currentMonth<1){currentMonth=12;currentYear--;}updateBoard();}
+function changeYear(d){currentYear+=d;updateBoard();}
+
+function startApp(){
+  var dobStr=document.getElementById('inp-dob').value;
+  if(!dobStr){alert('生年月日を入力してください');return;}
+  var rec=lookupDB(dobStr);
+  if(!rec){alert('この生年月日はデータベースに見つかりませんでした。\n対応範囲: 1926年〜2060年');return;}
+  honmeiStar=rec.nenKyusei;
+  var today=new Date();
+  currentYear=today.getFullYear();
+  currentMonth=today.getMonth()+1;
+  var dob=new Date(dobStr+'T00:00:00');
+  var age=today.getFullYear()-dob.getFullYear();
+  if(today.getMonth()-dob.getMonth()<0||(today.getMonth()===dob.getMonth()&&today.getDate()<dob.getDate()))age--;
+  var dobDisp=dob.getFullYear()+'年'+(dob.getMonth()+1)+'月'+dob.getDate()+'日';
+  document.getElementById('honmeiStrip').innerHTML=
+    '<span><span class="hs-label">生年月日 </span><span class="hs-val">'+dobDisp+'　'+age+'歳</span></span>'+
+    '<span><span class="hs-label">本命星 </span><span class="hs-star">'+honmeiStar+'</span></span>'+
+    '<span><span class="hs-label">月命星 </span><span class="hs-star">'+rec.tsuKyusei+'</span></span>';
+  document.getElementById('form-section').style.display='none';
+  document.getElementById('result-section').classList.add('active');
+  window.scrollTo(0,0);
+  updateBoard();
+}
+
+function goBack(){
+  document.getElementById('result-section').classList.remove('active');
+  document.getElementById('form-section').style.display='flex';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
